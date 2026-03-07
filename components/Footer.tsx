@@ -1,55 +1,45 @@
-import Link from "next/link";
+"use client";
+
+import { usePathname } from "next/navigation";
+
+const hiddenPrefixes = ["/student", "/instructor", "/admin"];
+const hiddenExact = ["/login", "/register"];
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  if (
+    hiddenExact.includes(pathname) ||
+    hiddenPrefixes.some((prefix) => pathname.startsWith(prefix))
+  ) {
+    return null;
+  }
+
   return (
-    <footer className="bg-gray-900 text-white mt-20">
-      <div className="max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-4 gap-10">
-        {/* Logo */}
-        <div>
-          <h2 className="text-2xl font-bold">Skilline</h2>
-          <p className="mt-4 text-gray-400">
-            The best platform to learn new skills online.
-          </p>
-        </div>
-
-        {/* Links */}
-        <div>
-          <h3 className="font-semibold mb-4">Company</h3>
-          <div className="flex flex-col gap-2 text-gray-400">
-            <Link href="/about">About</Link>
-            <Link href="/blog">Blog</Link>
-            <Link href="/courses">Courses</Link>
+    <footer className="mt-16 bg-[#252641] text-white">
+      <div className="mx-auto max-w-6xl px-5 py-12">
+        <div className="flex flex-col gap-6 border-b border-white/20 pb-8 md:flex-row md:items-center md:justify-between">
+          <div>
+            <h2 className="text-2xl font-extrabold">Skilline</h2>
+            <p className="mt-2 text-sm text-white/70">Virtual Class for quality learning.</p>
           </div>
-        </div>
-
-        {/* Resources */}
-        <div>
-          <h3 className="font-semibold mb-4">Resources</h3>
-          <div className="flex flex-col gap-2 text-gray-400">
-            <Link href="#">Help Center</Link>
-            <Link href="#">Privacy Policy</Link>
-            <Link href="#">Terms</Link>
-          </div>
-        </div>
-
-        {/* Newsletter */}
-        <div>
-          <h3 className="font-semibold mb-4">Subscribe</h3>
-
-          <div className="flex">
+          <form className="flex w-full max-w-md gap-2">
             <input
               type="email"
-              placeholder="Email address"
-              className="px-3 py-2 rounded-l-lg text-black w-full"
+              placeholder="Your Email"
+              className="w-full rounded-full border border-white/30 bg-transparent px-4 py-2 text-sm outline-none placeholder:text-white/50"
             />
-
-            <button className="bg-blue-600 px-4 rounded-r-lg">Join</button>
-          </div>
+            <button
+              type="button"
+              className="rounded-full bg-[#49bbbd] px-5 py-2 text-sm font-semibold text-[#0f1c39]"
+            >
+              Subscribe
+            </button>
+          </form>
         </div>
-      </div>
-
-      <div className="text-center py-6 border-t border-gray-700 text-gray-400">
-        © 2026 Skilline. All rights reserved.
+        <p className="pt-6 text-center text-xs text-white/60">
+          Copyright 2026 Skilline. All rights reserved.
+        </p>
       </div>
     </footer>
   );

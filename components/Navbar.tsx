@@ -1,60 +1,72 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
 
+const hiddenPrefixes = ["/student", "/instructor", "/admin"];
+const hiddenExact = ["/login", "/register"];
+
 export default function Navbar() {
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
 
+  if (
+    hiddenExact.includes(pathname) ||
+    hiddenPrefixes.some((prefix) => pathname.startsWith(prefix))
+  ) {
+    return null;
+  }
+
   return (
-    <header className="w-full bg-white shadow-sm">
-      <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
-        {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-blue-600">
+    <header className="sticky top-0 z-40 border-b border-[#ece4d8] bg-[#fdf4e6]/95 backdrop-blur">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
+        <Link href="/" className="text-xl font-black tracking-tight text-[#113c7a]">
           Skilline
         </Link>
 
-        {/* Desktop Menu */}
-        <nav className="hidden md:flex gap-8 font-medium">
+        <nav className="hidden items-center gap-8 text-sm font-medium text-[#1b2d5a] md:flex">
           <Link href="/">Home</Link>
-          <Link href="/courses">Courses</Link>
-          <Link href="/blog">Blog</Link>
-          <Link href="/about">About</Link>
+          <a href="#features">Features</a>
+          <a href="#portals">Portals</a>
+          <a href="#news">News</a>
         </nav>
 
-        {/* Right Buttons */}
-        <div className="hidden md:flex gap-4">
+        <div className="hidden items-center gap-3 md:flex">
           <Link
             href="/login"
-            className="px-4 py-2 border rounded-lg hover:bg-gray-100"
+            className="rounded-full border border-[#d2d6dc] px-5 py-2 text-sm font-semibold text-[#1b2d5a]"
           >
             Login
           </Link>
-
           <Link
-            href="/signup"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            href="/register"
+            className="rounded-full bg-[#f48c06] px-5 py-2 text-sm font-semibold text-white"
           >
             Sign Up
           </Link>
         </div>
 
-        {/* Mobile Button */}
-        <button className="md:hidden" onClick={() => setMenuOpen(!menuOpen)}>
-          ☰
+        <button
+          type="button"
+          className="rounded-md p-2 text-[#1b2d5a] md:hidden"
+          onClick={() => setMenuOpen((prev) => !prev)}
+          aria-label="Toggle menu"
+        >
+          <span className="text-2xl leading-none">{menuOpen ? "x" : "="}</span>
         </button>
       </div>
 
-      {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden flex flex-col gap-4 px-6 pb-4">
-          <Link href="/">Home</Link>
-          <Link href="/courses">Courses</Link>
-          <Link href="/blog">Blog</Link>
-          <Link href="/about">About</Link>
-
-          <Link href="/login">Login</Link>
-          <Link href="/signup">Sign Up</Link>
+        <div className="border-t border-[#ece4d8] bg-[#fdf4e6] px-5 py-4 md:hidden">
+          <div className="flex flex-col gap-3 text-sm font-medium text-[#1b2d5a]">
+            <Link href="/">Home</Link>
+            <a href="#features">Features</a>
+            <a href="#portals">Portals</a>
+            <a href="#news">News</a>
+            <Link href="/login">Login</Link>
+            <Link href="/register">Sign Up</Link>
+          </div>
         </div>
       )}
     </header>

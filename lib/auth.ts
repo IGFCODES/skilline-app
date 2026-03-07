@@ -1,6 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "./prisma";
+import prisma from "./prisma";
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
@@ -13,7 +13,7 @@ export const authOptions: NextAuthOptions = {
         password: {},
       },
 
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Missing credentials");
         }
@@ -36,7 +36,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         return {
-          id: user.id,
+          id: String(user.id),
           name: user.name,
           email: user.email,
           role: user.role,

@@ -1,11 +1,22 @@
 import prisma from "@/lib/prisma";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const body = await req.json();
-
   const { name, email, password } = body;
+
+  if (!name || !email || !password) {
+    return NextResponse.json({ error: "All fields are required." }, { status: 400 });
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (existingUser) {
+    return NextResponse.json({ error: "Email already exists." }, { status: 409 });
+  }
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -16,7 +27,13 @@ export async function POST(req: Request) {
       password: hashedPassword,
       role: "student",
     },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+    },
   });
 
-  return NextResponse.json(user);
+  return NextResponse.json(user, { status: 201 });
 }

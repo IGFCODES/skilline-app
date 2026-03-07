@@ -2,10 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global Styles */
+:root {
+  --bg: #f9fafb;
+  --text: #252641;
+  --brand-blue: #2f327d;
+  --brand-orange: #f48c06;
+}
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
-  background-color: white;
-  color: #1f2937;
+  font-family: var(--font-nunito), sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-poppins), sans-serif;
+}
+
+.container-skilline {
+  margin: 0 auto;
+  max-width: 1160px;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
 }
