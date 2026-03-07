@@ -1,22 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-const hiddenPrefixes = ["/student", "/instructor", "/admin"];
-const hiddenExact = ["/login", "/register"];
-
 export default function Navbar() {
-  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-
-  if (
-    hiddenExact.includes(pathname) ||
-    hiddenPrefixes.some((prefix) => pathname.startsWith(prefix))
-  ) {
-    return null;
-  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#ece4d8] bg-[#fdf4e6]/95 backdrop-blur">
@@ -27,9 +15,9 @@ export default function Navbar() {
 
         <nav className="hidden items-center gap-8 text-sm font-medium text-[#1b2d5a] md:flex">
           <Link href="/">Home</Link>
-          <a href="#features">Features</a>
-          <a href="#portals">Portals</a>
-          <a href="#news">News</a>
+          <Link href="/about">About Us</Link>
+          <Link href="/blog">Blog</Link>
+          <Link href="/careers">Careers</Link>
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
@@ -61,9 +49,9 @@ export default function Navbar() {
         <div className="border-t border-[#ece4d8] bg-[#fdf4e6] px-5 py-4 md:hidden">
           <div className="flex flex-col gap-3 text-sm font-medium text-[#1b2d5a]">
             <Link href="/">Home</Link>
-            <a href="#features">Features</a>
-            <a href="#portals">Portals</a>
-            <a href="#news">News</a>
+            <Link href="/about">About Us</Link>
+            <Link href="/blog">Blog</Link>
+            <Link href="/careers">Careers</Link>
             <Link href="/login">Login</Link>
             <Link href="/register">Sign Up</Link>
           </div>

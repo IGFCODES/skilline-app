@@ -2,7 +2,7 @@ import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const protectedPrefixes = ["/student", "/instructor", "/admin"];
+const protectedPrefixes = ["/student", "/instructor", "/admin", "/dashboard"];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -21,15 +21,15 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${role}`, request.url));
   }
 
-  if (token && pathname.startsWith("/student") && token.role !== "student") {
+  if (token && pathname.startsWith("/student") && token.role && token.role !== "student") {
     return NextResponse.redirect(new URL(`/${token.role}`, request.url));
   }
 
-  if (token && pathname.startsWith("/instructor") && token.role !== "instructor") {
+  if (token && pathname.startsWith("/instructor") && token.role && token.role !== "instructor") {
     return NextResponse.redirect(new URL(`/${token.role}`, request.url));
   }
 
-  if (token && pathname.startsWith("/admin") && token.role !== "admin") {
+  if (token && pathname.startsWith("/admin") && token.role && token.role !== "admin") {
     return NextResponse.redirect(new URL(`/${token.role}`, request.url));
   }
 
@@ -37,5 +37,12 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/student/:path*", "/instructor/:path*", "/admin/:path*", "/login", "/register"],
+  matcher: [
+    "/student/:path*",
+    "/instructor/:path*",
+    "/admin/:path*",
+    "/dashboard/:path*",
+    "/login",
+    "/register",
+  ],
 };

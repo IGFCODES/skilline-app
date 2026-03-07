@@ -1,20 +1,8 @@
 "use client";
 
-import { usePathname } from "next/navigation";
-
-const hiddenPrefixes = ["/student", "/instructor", "/admin"];
-const hiddenExact = ["/login", "/register"];
+import Link from "next/link";
 
 export default function Footer() {
-  const pathname = usePathname();
-
-  if (
-    hiddenExact.includes(pathname) ||
-    hiddenPrefixes.some((prefix) => pathname.startsWith(prefix))
-  ) {
-    return null;
-  }
-
   return (
     <footer className="mt-16 bg-[#252641] text-white">
       <div className="mx-auto max-w-6xl px-5 py-12">
@@ -22,6 +10,11 @@ export default function Footer() {
           <div>
             <h2 className="text-2xl font-extrabold">Skilline</h2>
             <p className="mt-2 text-sm text-white/70">Virtual Class for quality learning.</p>
+            <div className="mt-4 flex gap-4 text-sm text-white/80">
+              <Link href="/about">About Us</Link>
+              <Link href="/blog">Blog</Link>
+              <Link href="/careers">Careers</Link>
+            </div>
           </div>
           <form className="flex w-full max-w-md gap-2">
             <input

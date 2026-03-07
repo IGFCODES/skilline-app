@@ -55,7 +55,15 @@ export default function DashboardLayout({
           </button>
         </aside>
 
-        <main className="min-w-0 flex-1 rounded-2xl bg-white p-6 md:p-8">{children}</main>
+        <main className="min-w-0 flex-1 rounded-2xl bg-white p-6 md:p-8">
+          <div className="mb-6 flex flex-wrap items-center gap-3 border-b border-[#edf0f7] pb-4 text-sm font-semibold text-[#2f327d]">
+            <Link href="/">Home</Link>
+            <Link href="/about">About Us</Link>
+            <Link href="/blog">Blog</Link>
+            <Link href="/careers">Careers</Link>
+          </div>
+          {children}
+        </main>
       </div>
     </div>
   );

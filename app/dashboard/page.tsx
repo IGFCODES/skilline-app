@@ -1,16 +1,22 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
+  const role = session?.user?.role;
 
-  return (
-    <div className="p-10">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
+  if (!session?.user) {
+    redirect("/login");
+  }
 
-      <p className="mt-4">Welcome {session?.user?.name}</p>
+  if (role === "admin") {
+    redirect("/admin");
+  }
 
-      <p>Role: {session?.user?.role}</p>
-    </div>
-  );
+  if (role === "instructor") {
+    redirect("/instructor");
+  }
+
+  redirect("/student");
 }

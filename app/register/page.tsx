@@ -32,7 +32,7 @@ export default function RegisterPage() {
     }
 
     await signIn("credentials", { email, password, redirect: false });
-    router.push("/student");
+    router.push("/dashboard");
     router.refresh();
   };
 

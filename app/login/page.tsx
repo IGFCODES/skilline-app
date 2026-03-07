@@ -29,11 +29,7 @@ export default function LoginPage() {
       return;
     }
 
-    const sessionRes = await fetch("/api/auth/session");
-    const sessionData = await sessionRes.json();
-    const role = sessionData?.user?.role ?? "student";
-
-    router.push(`/${role}`);
+    router.push("/dashboard");
     router.refresh();
   };
 
