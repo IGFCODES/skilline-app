@@ -4,7 +4,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { name, email, password } = body;
+  const { name, email, password, role } = body;
+  const allowedRoles = ["student", "instructor", "admin"] as const;
+  const selectedRole = allowedRoles.includes(role) ? role : "student";
 
   if (!name || !email || !password) {
     return NextResponse.json({ error: "All fields are required." }, { status: 400 });
@@ -25,7 +27,7 @@ export async function POST(req: Request) {
       name,
       email,
       password: hashedPassword,
-      role: "student",
+      role: selectedRole,
     },
     select: {
       id: true,

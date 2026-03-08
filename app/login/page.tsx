@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
@@ -9,6 +9,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"student" | "instructor" | "admin">("student");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -29,6 +30,23 @@ export default function LoginPage() {
       return;
     }
 
+    const sessionRes = await fetch("/api/auth/session");
+    const sessionData = await sessionRes.json();
+    const signedInRole = sessionData?.user?.role as string | undefined;
+
+    if (!signedInRole) {
+      setError("Unable to determine account role. Try again.");
+      setLoading(false);
+      return;
+    }
+
+    if (signedInRole !== role) {
+      await signOut({ redirect: false });
+      setError(`This account is registered as ${signedInRole}. Please select the correct role.`);
+      setLoading(false);
+      return;
+    }
+
     router.push("/dashboard");
     router.refresh();
   };
@@ -44,9 +62,29 @@ export default function LoginPage() {
         </div>
         <div className="p-8 md:p-10">
           <h2 className="text-2xl font-bold text-[#2f327d]">Login</h2>
-          <p className="mt-2 text-sm text-[#696984]">Use your account details to continue.</p>
+          <p className="mt-2 text-sm text-[#696984]">
+            Use your account details and choose your portal role.
+          </p>
 
           <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-[#2f327d]" htmlFor="role">
+                Sign in as
+              </label>
+              <select
+                id="role"
+                value={role}
+                onChange={(event) =>
+                  setRole(event.target.value as "student" | "instructor" | "admin")
+                }
+                className="w-full rounded-xl border border-[#e0e0e0] px-4 py-3 outline-none focus:border-[#49bbbd]"
+              >
+                <option value="student">Student</option>
+                <option value="instructor">Instructor</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#2f327d]" htmlFor="email">
                 Email

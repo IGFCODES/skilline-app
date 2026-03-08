@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<"student" | "instructor" | "admin">("student");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +22,7 @@ export default function RegisterPage() {
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, role }),
     });
 
     if (!response.ok) {
@@ -42,14 +43,34 @@ export default function RegisterPage() {
         <div className="bg-[#49bbbd] p-10 text-[#102a43]">
           <h1 className="text-3xl font-extrabold">Create your Skilline account</h1>
           <p className="mt-4 text-sm">
-            Start as a student now. Admins can promote members to instructor from the admin portal.
+            Register as a student, instructor, or admin and get routed to the matching portal.
           </p>
         </div>
         <div className="p-8 md:p-10">
           <h2 className="text-2xl font-bold text-[#2f327d]">Register</h2>
-          <p className="mt-2 text-sm text-[#696984]">Create your account in under one minute.</p>
+          <p className="mt-2 text-sm text-[#696984]">
+            Create your account and choose the portal role.
+          </p>
 
           <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-[#2f327d]" htmlFor="role">
+                Register as
+              </label>
+              <select
+                id="role"
+                value={role}
+                onChange={(event) =>
+                  setRole(event.target.value as "student" | "instructor" | "admin")
+                }
+                className="w-full rounded-xl border border-[#e0e0e0] px-4 py-3 outline-none focus:border-[#49bbbd]"
+              >
+                <option value="student">Student</option>
+                <option value="instructor">Instructor</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#2f327d]" htmlFor="name">
                 Full name
