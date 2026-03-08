@@ -280,8 +280,8 @@ export default function HomePage() {
           <div>
             <h2 className="text-3xl font-extrabold">What They Say?</h2>
             <p className="mt-3 max-w-2xl text-sm text-white/80">
-              "The student and instructor portals helped our team run classes with better
-              coordination and clearer progress tracking."
+              &quot;The student and instructor portals helped our team run classes with better
+              coordination and clearer progress tracking.&quot;
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/register" className="rounded-full bg-[#f48c06] px-6 py-3 text-sm font-semibold">

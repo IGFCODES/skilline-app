@@ -1,5 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import type { User } from "next-auth";
 import prisma from "./prisma";
 import bcrypt from "bcryptjs";
 
@@ -13,34 +14,38 @@ export const authOptions: NextAuthOptions = {
         password: {},
       },
 
-      async authorize(credentials, req) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Missing credentials");
+      async authorize(credentials) {
+        try {
+          if (!credentials?.email || !credentials?.password) {
+            return null;
+          }
+
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+
+          if (!user) {
+            return null;
+          }
+
+          const passwordMatch = await bcrypt.compare(
+            credentials.password,
+            user.password,
+          );
+
+          if (!passwordMatch) {
+            return null;
+          }
+
+          return {
+            id: String(user.id),
+            name: user.name,
+            email: user.email,
+            role: user.role,
+          };
+        } catch {
+          return null;
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (!user) {
-          throw new Error("User not found");
-        }
-
-        const passwordMatch = await bcrypt.compare(
-          credentials.password,
-          user.password,
-        );
-
-        if (!passwordMatch) {
-          throw new Error("Invalid password");
-        }
-
-        return {
-          id: String(user.id),
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        };
       },
     }),
   ],
@@ -52,7 +57,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as any).role;
+        token.role = (user as User & { role?: string }).role;
         token.id = user.id;
       }
       return token;
@@ -71,5 +76,6 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
 
-  secret: process.env.NEXTAUTH_SECRET,
+  // Prevent hard failure when env var is missing in non-production/demo runs.
+  secret: process.env.NEXTAUTH_SECRET ?? "skilline-demo-fallback-secret",
 };

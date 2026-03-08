@@ -19,22 +19,38 @@ export default function RegisterPage() {
     setError("");
     setLoading(true);
 
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, role }),
-    });
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password, role }),
+      });
 
-    if (!response.ok) {
-      const data = await response.json();
-      setError(data.error ?? "Registration failed.");
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.error ?? "Registration failed.");
+        setLoading(false);
+        return;
+      }
+
+      const loginResult = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (loginResult?.error) {
+        setError("Account created, but auto-login failed. Please log in manually.");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      setError("Registration failed due to a network/server error.");
       setLoading(false);
-      return;
     }
-
-    await signIn("credentials", { email, password, redirect: false });
-    router.push("/dashboard");
-    router.refresh();
   };
 
   return (

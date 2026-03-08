@@ -18,37 +18,42 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-    if (result?.error) {
-      setError("Invalid email or password.");
+      if (result?.error) {
+        setError("Invalid email or password.");
+        setLoading(false);
+        return;
+      }
+
+      const sessionRes = await fetch("/api/auth/session");
+      const sessionData = await sessionRes.json();
+      const signedInRole = sessionData?.user?.role as string | undefined;
+
+      if (!signedInRole) {
+        setError("Unable to determine account role. Try again.");
+        setLoading(false);
+        return;
+      }
+
+      if (signedInRole !== role) {
+        await signOut({ redirect: false });
+        setError(`This account is registered as ${signedInRole}. Please select the correct role.`);
+        setLoading(false);
+        return;
+      }
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      setError("Login failed due to a network/server error.");
       setLoading(false);
-      return;
     }
-
-    const sessionRes = await fetch("/api/auth/session");
-    const sessionData = await sessionRes.json();
-    const signedInRole = sessionData?.user?.role as string | undefined;
-
-    if (!signedInRole) {
-      setError("Unable to determine account role. Try again.");
-      setLoading(false);
-      return;
-    }
-
-    if (signedInRole !== role) {
-      await signOut({ redirect: false });
-      setError(`This account is registered as ${signedInRole}. Please select the correct role.`);
-      setLoading(false);
-      return;
-    }
-
-    router.push("/dashboard");
-    router.refresh();
   };
 
   return (

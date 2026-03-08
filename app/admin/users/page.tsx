@@ -19,11 +19,13 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true);
 
   const loadUsers = async () => {
-    setLoading(true);
-    const response = await fetch("/api/admin/users");
-    const data = await response.json();
-    setUsers(data);
-    setLoading(false);
+    try {
+      const response = await fetch("/api/admin/users");
+      const data = await response.json();
+      setUsers(data);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -32,6 +34,7 @@ export default function AdminUsers() {
 
   const updateRole = async (id: number, role: User["role"]) => {
     setMessage("");
+    setLoading(true);
     const response = await fetch("/api/admin/promote", {
       method: "POST",
       headers: {
@@ -43,6 +46,7 @@ export default function AdminUsers() {
     if (!response.ok) {
       const data = await response.json();
       setMessage(data.error ?? "Failed to update role.");
+      setLoading(false);
       return;
     }
 

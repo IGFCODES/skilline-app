@@ -18,11 +18,13 @@ export default function CoursesPage() {
   const [message, setMessage] = useState("");
 
   const loadCourses = async () => {
-    setLoading(true);
-    const response = await fetch("/api/courses");
-    const data = await response.json();
-    setCourses(data);
-    setLoading(false);
+    try {
+      const response = await fetch("/api/courses");
+      const data = await response.json();
+      setCourses(data);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
