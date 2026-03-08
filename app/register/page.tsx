@@ -15,6 +15,15 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const parseResponseError = async (response: Response, fallback: string) => {
+    try {
+      const data = await response.json();
+      return (data?.error as string | undefined) ?? fallback;
+    } catch {
+      return fallback;
+    }
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
@@ -28,8 +37,7 @@ export default function RegisterPage() {
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        setError(data.error ?? "Registration failed.");
+        setError(await parseResponseError(response, "Registration failed."));
         setLoading(false);
         return;
       }
