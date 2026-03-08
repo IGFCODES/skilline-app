@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { signIn, signOut } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
@@ -9,6 +9,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<"student" | "instructor" | "admin">("student");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,6 +20,33 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      const verifyRes = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const verifyData = await verifyRes.json();
+
+      if (!verifyRes.ok) {
+        setError(verifyData.error ?? "Invalid email or password.");
+        setLoading(false);
+        return;
+      }
+
+      const actualRole = verifyData?.role as string | undefined;
+      if (!actualRole) {
+        setError("Unable to determine account role. Try again.");
+        setLoading(false);
+        return;
+      }
+
+      if (actualRole !== role) {
+        setError(`This account is registered as ${actualRole}. Please select the correct role.`);
+        setLoading(false);
+        return;
+      }
+
       const result = await signIn("credentials", {
         email,
         password,
@@ -27,23 +55,6 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError("Invalid email or password.");
-        setLoading(false);
-        return;
-      }
-
-      const sessionRes = await fetch("/api/auth/session");
-      const sessionData = await sessionRes.json();
-      const signedInRole = sessionData?.user?.role as string | undefined;
-
-      if (!signedInRole) {
-        setError("Unable to determine account role. Try again.");
-        setLoading(false);
-        return;
-      }
-
-      if (signedInRole !== role) {
-        await signOut({ redirect: false });
-        setError(`This account is registered as ${signedInRole}. Please select the correct role.`);
         setLoading(false);
         return;
       }
@@ -108,14 +119,23 @@ export default function LoginPage() {
               <label className="mb-2 block text-sm font-semibold text-[#2f327d]" htmlFor="password">
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                className="w-full rounded-xl border border-[#e0e0e0] px-4 py-3 outline-none focus:border-[#49bbbd]"
-              />
+              <div className="flex items-center gap-2 rounded-xl border border-[#e0e0e0] px-3 focus-within:border-[#49bbbd]">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  className="w-full border-0 bg-transparent px-1 py-3 outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="text-xs font-semibold text-[#2f327d]"
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
 
             {error ? <p className="text-sm text-red-600">{error}</p> : null}
