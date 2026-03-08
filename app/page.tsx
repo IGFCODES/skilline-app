@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 
 const partners = ["Google", "NETFLIX", "airbnb", "amazon", "facebook", "Grab"];
@@ -65,6 +68,8 @@ const blogPosts = [
 ];
 
 export default function HomePage() {
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
+
   return (
     <div className="overflow-x-hidden">
       <section className="relative bg-[#fdf4e6] pb-28 pt-14">
@@ -83,12 +88,13 @@ export default function HomePage() {
               >
                 Join for free
               </Link>
-              <a
-                href="#features"
+              <button
+                type="button"
+                onClick={() => setIsVideoOpen(true)}
                 className="rounded-full border border-[#d8d8d8] bg-white px-6 py-3 text-sm font-semibold text-[#2f327d]"
               >
                 Watch how it works
-              </a>
+              </button>
             </div>
           </div>
           <div className="relative mx-auto w-full max-w-md">
@@ -313,6 +319,37 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {isVideoOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+          onClick={() => setIsVideoOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-4xl overflow-hidden rounded-2xl bg-black shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setIsVideoOpen(false)}
+              aria-label="Close video"
+              className="absolute right-3 top-3 z-10 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-[#111827]"
+            >
+              Close
+            </button>
+            <div className="aspect-video w-full">
+              <iframe
+                className="h-full w-full"
+                src="https://www.youtube.com/embed/9No-FiEInLA?autoplay=1&rel=0"
+                title="How Skilline works"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
