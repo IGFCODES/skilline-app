@@ -22,7 +22,7 @@ This project includes:
 - TypeScript
 - Prisma ORM
 - NextAuth (Credentials provider)
-- SQLite (local dev)
+- PostgreSQL
 - Tailwind CSS
 
 ---
@@ -88,3 +88,24 @@ prisma/
   migrations/
 proxy.ts
 vercel.json
+
+---
+
+## Environment Setup
+
+Create a `.env` file with:
+
+```env
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/skilline?schema=public"
+NEXTAUTH_SECRET="replace-with-a-strong-secret"
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+Run database setup:
+
+```bash
+npx prisma generate
+npx prisma migrate deploy
+```
+
+For Vercel, set the same env vars in Project Settings, then redeploy.
