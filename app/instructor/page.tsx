@@ -2,11 +2,21 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function InstructorDashboard() {
   const session = await getServerSession(authOptions);
+  const role = session?.user?.role;
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  if (role && role !== "instructor") {
+    redirect(`/${role}`);
+  }
 
   const courses = await prisma.course.findMany({
     where: { instructorId: Number(session?.user?.id ?? 0) },

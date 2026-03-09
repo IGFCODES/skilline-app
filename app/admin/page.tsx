@@ -1,9 +1,23 @@
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
+  const session = await getServerSession(authOptions);
+  const role = session?.user?.role;
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  if (role !== "admin") {
+    redirect(role ? `/${role}` : "/login");
+  }
+
   const [userCount, courseCount, enrollmentCount] = await Promise.all([
     prisma.user.count(),
     prisma.course.count(),

@@ -11,7 +11,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<"student" | "instructor" | "admin">("student");
+  const [role, setRole] = useState<"student" | "instructor">("student");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -38,7 +38,6 @@ export default function RegisterPage() {
 
       if (!response.ok) {
         setError(await parseResponseError(response, "Registration failed."));
-        setLoading(false);
         return;
       }
 
@@ -50,14 +49,14 @@ export default function RegisterPage() {
 
       if (loginResult?.error) {
         setError("Account created, but auto-login failed. Please log in manually.");
-        setLoading(false);
         return;
       }
 
-      router.push("/dashboard");
+      router.replace("/dashboard");
       router.refresh();
     } catch {
       setError("Registration failed due to a network/server error.");
+    } finally {
       setLoading(false);
     }
   };
@@ -68,7 +67,7 @@ export default function RegisterPage() {
         <div className="bg-[#49bbbd] p-10 text-[#102a43]">
           <h1 className="text-3xl font-extrabold">Create your Skilline account</h1>
           <p className="mt-4 text-sm">
-            Register as a student, instructor, or admin and get routed to the matching portal.
+            Register as a student or instructor and get routed to the matching portal.
           </p>
         </div>
         <div className="p-8 md:p-10">
@@ -86,13 +85,12 @@ export default function RegisterPage() {
                 id="role"
                 value={role}
                 onChange={(event) =>
-                  setRole(event.target.value as "student" | "instructor" | "admin")
+                  setRole(event.target.value as "student" | "instructor")
                 }
                 className="w-full rounded-xl border border-[#e0e0e0] px-4 py-3 outline-none focus:border-[#49bbbd]"
               >
                 <option value="student">Student</option>
                 <option value="instructor">Instructor</option>
-                <option value="admin">Admin</option>
               </select>
             </div>
 

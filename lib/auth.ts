@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import type { User } from "next-auth";
 import prisma from "./prisma";
 import bcrypt from "bcryptjs";
+import { AUTH_SECRET } from "./auth-secret";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -16,12 +17,14 @@ export const authOptions: NextAuthOptions = {
 
       async authorize(credentials) {
         try {
-          if (!credentials?.email || !credentials?.password) {
+          const email = credentials?.email?.trim().toLowerCase();
+
+          if (!email || !credentials?.password) {
             return null;
           }
 
           const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
+            where: { email },
           });
 
           if (!user) {
@@ -43,7 +46,8 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             role: user.role,
           };
-        } catch {
+        } catch (error) {
+          console.error("NextAuth authorize error:", error);
           return null;
         }
       },
@@ -76,6 +80,5 @@ export const authOptions: NextAuthOptions = {
     signIn: "/login",
   },
 
-  // Prevent hard failure when env var is missing in non-production/demo runs.
-  secret: process.env.NEXTAUTH_SECRET ?? "skilline-demo-fallback-secret",
+  secret: AUTH_SECRET,
 };

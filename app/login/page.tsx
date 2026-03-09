@@ -10,7 +10,6 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<"student" | "instructor" | "admin">("student");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -50,29 +49,9 @@ export default function LoginPage() {
         </div>
         <div className="p-8 md:p-10">
           <h2 className="text-2xl font-bold text-[#2f327d]">Login</h2>
-          <p className="mt-2 text-sm text-[#696984]">
-            Use your account details and choose your portal role.
-          </p>
+          <p className="mt-2 text-sm text-[#696984]">Use your account details to sign in.</p>
 
           <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-[#2f327d]" htmlFor="role">
-                Sign in as
-              </label>
-              <select
-                id="role"
-                value={role}
-                onChange={(event) =>
-                  setRole(event.target.value as "student" | "instructor" | "admin")
-                }
-                className="w-full rounded-xl border border-[#e0e0e0] px-4 py-3 outline-none focus:border-[#49bbbd]"
-              >
-                <option value="student">Student</option>
-                <option value="instructor">Instructor</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-
             <div>
               <label className="mb-2 block text-sm font-semibold text-[#2f327d]" htmlFor="email">
                 Email

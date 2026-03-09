@@ -2,11 +2,21 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
 export default async function StudentDashboard() {
   const session = await getServerSession(authOptions);
+  const role = session?.user?.role;
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  if (role && role !== "student") {
+    redirect(`/${role}`);
+  }
 
   const [courseCount, enrollments] = await Promise.all([
     prisma.course.count(),

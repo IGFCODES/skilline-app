@@ -6,12 +6,21 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, email, password, role } = body;
-    const allowedRoles = ["student", "instructor", "admin"] as const;
+    const name = typeof body?.name === "string" ? body.name.trim() : "";
+    const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
+    const password = typeof body?.password === "string" ? body.password : "";
+    const role = typeof body?.role === "string" ? body.role : "";
+    const allowedRoles = ["student", "instructor"] as const;
     const selectedRole = allowedRoles.includes(role) ? role : "student";
 
     if (!name || !email || !password) {
       return NextResponse.json({ error: "All fields are required." }, { status: 400 });
+    }
+    if (password.length < 6) {
+      return NextResponse.json(
+        { error: "Password must be at least 6 characters." },
+        { status: 400 },
+      );
     }
 
     const existingUser = await prisma.user.findUnique({
