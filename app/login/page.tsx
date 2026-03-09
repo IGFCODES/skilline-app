@@ -14,15 +14,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const parseResponseError = async (response: Response, fallback: string) => {
-    try {
-      const data = await response.json();
-      return (data?.error as string | undefined) ?? fallback;
-    } catch {
-      return fallback;
-    }
-  };
-
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
@@ -37,29 +28,13 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError("Invalid email or password.");
-        setLoading(false);
         return;
       }
-
-      const sessionRes = await fetch("/api/auth/session");
-      if (!sessionRes.ok) {
-        setError(await parseResponseError(sessionRes, "Login failed. Please try again."));
-        setLoading(false);
-        return;
-      }
-
-      const sessionData = await sessionRes.json();
-      const actualRole = sessionData?.user?.role as string | undefined;
-      if (actualRole && actualRole !== role) {
-        setError(`This account is registered as ${actualRole}. Please select the correct role.`);
-        setLoading(false);
-        return;
-      }
-
-      router.push("/dashboard");
+      router.replace("/dashboard");
       router.refresh();
     } catch {
       setError("Login failed due to a network/server error.");
+    } finally {
       setLoading(false);
     }
   };
