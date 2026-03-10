@@ -12,10 +12,35 @@ model User {
   name        String
   email       String       @unique
   password    String
+  emailVerified DateTime?
   role        String       @default("student")
   createdAt   DateTime     @default(now())
   courses     Course[]     @relation("InstructorCourses")
   enrollments Enrollment[]
+  authTokens  AuthToken[]
+}
+
+enum AuthTokenType {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
+model AuthToken {
+  id           Int           @id @default(autoincrement())
+  email        String
+  tokenHash    String        @unique
+  type         AuthTokenType
+  name         String?
+  passwordHash String?
+  role         String?
+  expiresAt    DateTime
+  usedAt       DateTime?
+  createdAt    DateTime      @default(now())
+  userId       Int?
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([email, type])
+  @@index([userId, type])
 }
 
 model Course {

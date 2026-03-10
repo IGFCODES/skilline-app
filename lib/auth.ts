@@ -30,6 +30,9 @@ export const authOptions: NextAuthOptions = {
           if (!user) {
             return null;
           }
+          if (!user.emailVerified) {
+            throw new Error("Please verify your email before logging in.");
+          }
 
           const passwordMatch = await bcrypt.compare(
             credentials.password,
@@ -48,6 +51,12 @@ export const authOptions: NextAuthOptions = {
           };
         } catch (error) {
           console.error("NextAuth authorize error:", error);
+          if (
+            error instanceof Error &&
+            error.message === "Please verify your email before logging in."
+          ) {
+            throw error;
+          }
           return null;
         }
       },

@@ -3,15 +3,39 @@
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const verified = params.get("verified");
+    const reset = params.get("reset");
+
+    if (verified === "1") {
+      setNotice("Email verified successfully. You can now log in.");
+      return;
+    }
+
+    if (verified === "invalid") {
+      setNotice("Verification link is invalid or expired. Please register again.");
+      return;
+    }
+
+    if (reset === "1") {
+      setNotice("Password reset successful. You can now log in.");
+      return;
+    }
+
+    setNotice("");
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -26,9 +50,14 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError("Invalid email or password.");
+        if (result.error.includes("Please verify your email")) {
+          setError("Please verify your email before logging in.");
+        } else {
+          setError("Invalid email or password.");
+        }
         return;
       }
+
       router.replace("/dashboard");
       router.refresh();
     } catch {
@@ -89,6 +118,7 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {notice ? <p className="text-sm text-green-700">{notice}</p> : null}
             {error ? <p className="text-sm text-red-600">{error}</p> : null}
 
             <button
@@ -98,6 +128,12 @@ export default function LoginPage() {
               {loading ? "Signing in..." : "Login"}
             </button>
           </form>
+
+          <p className="mt-4 text-sm">
+            <Link href="/forgot-password" className="font-semibold text-[#2f327d]">
+              Forgot password?
+            </Link>
+          </p>
 
           <p className="mt-5 text-sm text-[#696984]">
             No account yet?{" "}

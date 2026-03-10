@@ -17,6 +17,12 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
+    if (!user.emailVerified) {
+      return NextResponse.json(
+        { error: "Please verify your email before logging in." },
+        { status: 403 },
+      );
+    }
 
     const valid = await bcrypt.compare(password, user.password);
 

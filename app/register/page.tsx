@@ -1,18 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 export default function RegisterPage() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<"student" | "instructor">("student");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
   const parseResponseError = async (response: Response, fallback: string) => {
@@ -27,6 +25,7 @@ export default function RegisterPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
+    setSuccess("");
     setLoading(true);
 
     try {
@@ -41,19 +40,11 @@ export default function RegisterPage() {
         return;
       }
 
-      const loginResult = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (loginResult?.error) {
-        setError("Account created, but auto-login failed. Please log in manually.");
-        return;
-      }
-
-      router.replace("/dashboard");
-      router.refresh();
+      setSuccess("Verification email sent. Check your inbox and verify before logging in.");
+      setName("");
+      setEmail("");
+      setPassword("");
+      setRole("student");
     } catch {
       setError("Registration failed due to a network/server error.");
     } finally {
@@ -147,6 +138,7 @@ export default function RegisterPage() {
             </div>
 
             {error ? <p className="text-sm text-red-600">{error}</p> : null}
+            {success ? <p className="text-sm text-green-700">{success}</p> : null}
 
             <button
               disabled={loading}

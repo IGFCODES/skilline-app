@@ -44,14 +44,18 @@ This project includes:
 
 ### Authentication & Authorization
 - Credentials-based auth with NextAuth
-- Role selection at login/register (student/instructor/admin)
+- Email verification required before first login
+- Password reset via email link
+- Role selection at register only (student/instructor)
 - Role-protected routes via `proxy.ts`
 - Correct redirect after auth via `/dashboard`
 
 ### API Routes
 - Auth:
   - `POST /api/auth/register`
-  - `POST /api/auth/login`
+  - `GET /api/auth/verify-email`
+  - `POST /api/auth/forgot-password`
+  - `POST /api/auth/reset-password`
   - `GET/POST /api/auth/[...nextauth]`
 - Courses:
   - `GET /api/courses`
@@ -99,6 +103,8 @@ Create a `.env` file with:
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/skilline?schema=public"
 NEXTAUTH_SECRET="replace-with-a-strong-secret"
 NEXTAUTH_URL="http://localhost:3000"
+RESEND_API_KEY="re_xxxxxxxxx"
+EMAIL_FROM="Skilline <no-reply@yourdomain.com>"
 ```
 
 Run database setup:

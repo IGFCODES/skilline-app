@@ -2,6 +2,8 @@ import prisma from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
+import { issueAuthToken } from "@/lib/auth-tokens";
+import { sendVerificationEmail } from "@/lib/email";
 
 export async function POST(req: Request) {
   try {
@@ -23,32 +25,35 @@ export async function POST(req: Request) {
       );
     }
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (existingUser) {
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser?.emailVerified) {
       return NextResponse.json({ error: "Email already exists." }, { status: 409 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
-      data: {
-        name,
+    await prisma.authToken.deleteMany({
+      where: {
         email,
-        password: hashedPassword,
-        role: selectedRole,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
+        type: "VERIFY_EMAIL",
       },
     });
 
-    return NextResponse.json(user, { status: 201 });
+    const { token } = await issueAuthToken({
+      email,
+      type: "VERIFY_EMAIL",
+      expiresInMinutes: 24 * 60,
+      name,
+      passwordHash: hashedPassword,
+      role: selectedRole,
+    });
+
+    await sendVerificationEmail(email, token);
+
+    return NextResponse.json(
+      { message: "Verification email sent. Check your inbox to activate your account." },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("Register API error:", error);
 
